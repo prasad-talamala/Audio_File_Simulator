@@ -31,25 +31,30 @@ def add_file(request, audioFileType):
     audioFileMetadata.update({"uploaded_time": timezone.localtime().now()})
 
     if request.method == 'POST':
-        if audioFileType == "song":
-            new_instance = Song.objects.create(name=audioFileMetadata["name"], duration=audioFileMetadata["duration"],
-                                               uploaded_time=audioFileMetadata["uploaded_time"])
+        try:
+            if audioFileType == "song":
+                new_instance = Song.objects.create(name=audioFileMetadata["name"], duration=audioFileMetadata["duration"],
+                                                   uploaded_time=audioFileMetadata["uploaded_time"])
 
-        elif audioFileType == "podcast":
-            new_instance = Podcast.objects.create(name=audioFileMetadata["name"],
-                                                  duration=audioFileMetadata["duration"],
-                                                  uploaded_time=audioFileMetadata["uploaded_time"],
-                                                  host=audioFileMetadata["host"],
-                                                  participants=audioFileMetadata["participants"])
+            elif audioFileType == "podcast":
+                new_instance = Podcast.objects.create(name=audioFileMetadata["name"],
+                                                      duration=audioFileMetadata["duration"],
+                                                      uploaded_time=audioFileMetadata["uploaded_time"],
+                                                      host=audioFileMetadata["host"],
+                                                      participants=audioFileMetadata["participants"])
 
-        elif audioFileType == "audiobook":
-            new_instance = Audiobook.objects.create(title=audioFileMetadata["title"],
-                                                    author=audioFileMetadata["author"],
-                                                    narrator=audioFileMetadata["narrator"],
-                                                    duration=audioFileMetadata["duration"],
-                                                    uploaded_time=audioFileMetadata["uploaded_time"])
-        else:
-            return HttpResponse("The request is invalid.")
+            elif audioFileType == "audiobook":
+                new_instance = Audiobook.objects.create(title=audioFileMetadata["title"],
+                                                        author=audioFileMetadata["author"],
+                                                        narrator=audioFileMetadata["narrator"],
+                                                        duration=audioFileMetadata["duration"],
+                                                        uploaded_time=audioFileMetadata["uploaded_time"])
+            else:
+                return HttpResponse("The request is invalid.")
+        except KeyError as ke:
+            return HttpResponse("KeyError: {}".format(str(ke)))
+        except Exception as e:
+            return HttpResponse(str(e))
 
         return HttpResponse("{} added successfully with id: {}.".format(audioFileType, new_instance.id))
 
